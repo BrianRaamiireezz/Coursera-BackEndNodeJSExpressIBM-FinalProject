@@ -98,9 +98,31 @@ public_users.get(
 );
 
 //  Get book review
-public_users.get('/review/:isbn', function (req, res) {
-  //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
-});
+public_users.get(
+  '/review/:isbn',
+  function (req, res) {
+    const isbn = req.params.isbn;
+
+    if (
+      isbn &&
+      Object.keys(books).includes(isbn)
+    ) {
+      const reviews = books[isbn]["reviews"];
+
+      if(
+        !reviews ||
+        Object.keys(reviews).length === 0
+      ){
+        res.send("The book doesn't have any reviews yet");
+      }
+      else{
+        res.json(reviews);
+      }
+    }
+    else {
+      res.send("Unable to find the book!");
+    }
+  }
+);
 
 module.exports.general = public_users;
