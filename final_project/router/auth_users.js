@@ -55,7 +55,8 @@ regd_users.post(
         );
 
         req.session.authorization = {
-          accessToken
+          accessToken,
+          username
         }
 
         res.send("User successfully logged in");
@@ -71,10 +72,26 @@ regd_users.post(
 );
 
 // Add a book review
-regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({ message: "Yet to be implemented" });
-});
+regd_users.put(
+  "/auth/review/:isbn",
+  (req, res) => {
+    const isbn = req.params.isbn;
+    const review = req.query.review;
+
+    if (
+      isbn &&
+      review &&
+      Object.keys(books).includes(isbn)
+    ) {
+      books[isbn]["reviews"][req.session.authorization["username"]] = review;
+
+      res.send("Review successfully added");
+    }
+    else {
+      res.send("Unable to find the book!");
+    }
+  }
+);
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
