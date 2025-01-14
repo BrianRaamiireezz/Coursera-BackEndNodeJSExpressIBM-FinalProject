@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require("axios");
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
@@ -42,6 +43,27 @@ public_users.get(
   }
 );
 
+const URL_BASE = "http://localhost:5000"
+
+// Asynchronously get the book list available in the shop
+public_users.get(
+  '/async',
+  function (req, res) {
+    axios.get(URL_BASE + "/")
+      .then(
+        response => {
+          res.json({ ...response.data });
+        }
+
+      )
+      .catch(
+        _error => {
+          res.status(500).send("There was an error retrieving the books data");
+        }
+      );
+  }
+);
+
 // Get book details based on ISBN
 public_users.get(
   '/isbn/:isbn',
@@ -53,6 +75,31 @@ public_users.get(
       Object.keys(books).includes(isbn)
     ) {
       res.json(books[isbn]);
+    }
+    else {
+      res.status(404).send("Unable to find the book!");
+    }
+  }
+);
+
+// Asynchronously get book details based on ISBN
+public_users.get(
+  '/async/isbn/:isbn',
+  function (req, res) {
+    const isbn = req.params.isbn;
+
+    if (isbn) {
+      axios.get(URL_BASE + "/isbn/" + isbn)
+        .then(
+          response => {
+            res.json({ ...response.data });
+          }
+        )
+        .catch(
+          _error => {
+            res.status(500).send("There was an error retrieving the book data");
+          }
+        );
     }
     else {
       res.status(404).send("Unable to find the book!");
@@ -99,6 +146,32 @@ public_users.get(
   }
 );
 
+// Asynchronously get book details based on author
+public_users.get(
+  '/async/author/:author',
+  function (req, res) {
+    const author = req.params.author;
+
+    if (author) {
+      axios.get(URL_BASE + "/author/" + author)
+        .then(
+          response => {
+            res.json({ ...response.data });
+          }
+        )
+        .catch(
+          _error => {
+            res.status(500).send("There was an error retrieving the books data");
+          }
+        );
+    }
+    else {
+      res.status(404).send("Unable to find any books matching the author provided!");
+    }
+  }
+);
+
+
 // Get all books based on title
 public_users.get(
   '/title/:title',
@@ -111,6 +184,31 @@ public_users.get(
       _get_book_by_attribute("title", title, found_books)
     ) {
       res.json({ books: found_books });
+    }
+    else {
+      res.status(404).send("Unable to find any books matching the title provided!");
+    }
+  }
+);
+
+// Asynchronously get all books based on title
+public_users.get(
+  '/async/title/:title',
+  function (req, res) {
+    const title = req.params.title;
+
+    if (title) {
+      axios.get(URL_BASE + "/title/" + title)
+        .then(
+          response => {
+            res.json({ ...response.data });
+          }
+        )
+        .catch(
+          _error => {
+            res.status(500).send("There was an error retrieving the books data");
+          }
+        );
     }
     else {
       res.status(404).send("Unable to find any books matching the title provided!");
