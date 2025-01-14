@@ -62,11 +62,11 @@ regd_users.post(
         res.send("User successfully logged in");
       }
       else {
-        res.send("Either the username or password is incorrect!");
+        res.status(401).send("Either the username or password is incorrect!");
       }
     }
     else {
-      res.send("Both username and password are required!");
+      res.status(400).send("Both username and password are required!");
     }
   }
 );
@@ -88,7 +88,7 @@ regd_users.put(
       res.send("Review successfully added");
     }
     else {
-      res.send("Unable to find the book!");
+      res.status(404).send("Unable to find the book!");
     }
   }
 );
@@ -107,7 +107,7 @@ regd_users.delete(
       res.send("Review successfully deleted");
     }
     else {
-      res.send("Unable to find the book!");
+      res.status(404).send("Unable to find the book!");
     }
   }
 );
