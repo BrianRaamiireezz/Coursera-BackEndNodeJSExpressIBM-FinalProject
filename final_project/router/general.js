@@ -25,11 +25,11 @@ public_users.post(
         res.send("User successfully registered");
       }
       else {
-        res.send("The username provided already exists!");
+        res.status(409).send("The username provided already exists!");
       }
     }
     else {
-      res.send("Both username and password are required!");
+      res.status(400).send("Both username and password are required!");
     }
   }
 );
@@ -55,26 +55,23 @@ public_users.get(
       res.json(books[isbn]);
     }
     else {
-      res.send("Unable to find the book!");
+      res.status(404).send("Unable to find the book!");
     }
   }
 );
 
 // Util function
 function _get_book_by_attribute(attribute, value, result) {
-  const found_book =
-    Object.values(books).find(
+  const found_books =
+    Object.values(books).filter(
       book => (
         book[attribute] === value
       )
     );
 
-  if (result) {
-    Object.keys(found_book).forEach(
-      key => {
-        result[key] = found_book[key]
-      }
-    );
+  if (found_books.length > 0) {
+    result.length = 0;
+    result.push(...found_books);
 
     return true;
   }
@@ -88,16 +85,16 @@ public_users.get(
   '/author/:author',
   function (req, res) {
     const author = req.params.author;
-    let found_book = {};
+    let found_books = [];
 
     if (
       author &&
-      _get_book_by_attribute("author", author, found_book)
+      _get_book_by_attribute("author", author, found_books)
     ) {
-      res.json({ book: found_book });
+      res.json({ books: found_books });
     }
     else {
-      res.send("Unable to find the book!");
+      res.status(404).send("Unable to find any books matching the author provided!");
     }
   }
 );
@@ -107,16 +104,16 @@ public_users.get(
   '/title/:title',
   function (req, res) {
     const title = req.params.title;
-    let found_book = {};
+    let found_books = [];
 
     if (
       title &&
-      _get_book_by_attribute("title", title, found_book)
+      _get_book_by_attribute("title", title, found_books)
     ) {
-      res.json({ book: found_book });
+      res.json({ books: found_books });
     }
     else {
-      res.send("Unable to find the book!");
+      res.status(404).send("Unable to find any books matching the title provided!");
     }
   }
 );
@@ -137,14 +134,15 @@ public_users.get(
         !reviews ||
         Object.keys(reviews).length === 0
       ) {
-        res.send("The book doesn't have any reviews yet");
+        // "The book doesn't have any reviews yet"
+        res.status(204).send();
       }
       else {
         res.json(reviews);
       }
     }
     else {
-      res.send("Unable to find the book!");
+      res.status(404).send("Unable to find the book!");
     }
   }
 );
